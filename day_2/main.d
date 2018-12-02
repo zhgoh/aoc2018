@@ -2,15 +2,11 @@ import std.file;
 import std.stdio;
 import std.conv;
 import std.string;
-// import std.range;
-// import std.algorithm.sorting;
-// import std.algorithm.iteration;
 
 void main()
 {
     string[] lines = read_from_file("input.txt");
-    // string[] lines = read_from_file("test_input_2.txt");
-    //writeln(part1(lines));
+    writeln(part1(lines));
     writeln(part2(lines));
 }
 
@@ -77,6 +73,7 @@ string part2(string[] lines)
 {
     string result;
 
+    // Taking a look at the inputs, the max length of the string is about 27
     int maxDiff = 30;
     string[2] match;
     foreach(string first; lines)
@@ -87,9 +84,11 @@ string part2(string[] lines)
                 continue;
             
             string currentResult;
+            // Compute the difference and also store the result upon checking
             immutable int currentDiff = difference(first, second, currentResult);
             if (currentDiff < maxDiff)
             {
+                // Only take the better results
                 maxDiff = currentDiff;
                 match[0] = first;
                 match[1] = second;
