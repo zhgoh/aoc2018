@@ -48,26 +48,33 @@ Rect[] read_from_file(string fileName)
           rect.size.x = to!int(c[3]);
           rect.size.y = to!int(c[4]);
         }
-        
+
         rects[rects.length++] = rect;
     }
     return rects;
 }
 
+// This is hardcoded..
 immutable int BOARD_WIDTH = 1000;
 immutable int BOARD_HEIGHT = 1000;
 
 int part1(Rect[] rects)
-{   
+{
+    // Initialize a board and using a layering algorithm
+    // 0 = Not occupied
+    // 1 = Occupied by one rect
+    // n = Occupied by n rects 
     int[] board = new int[BOARD_WIDTH * BOARD_HEIGHT];
     for (int i = 0; i < rects.length; ++i)
     {
         immutable Rect rect = rects[i];
+
+        // Go through the rect and add 1s onto the board that it occupies
         for (int y = rect.pos.y; y < (rect.pos.y + rect.size.y); ++y)
             for (int x = rect.pos.x; x < (rect.pos.x + rect.size.x); ++x)
-                ++board[y * BOARD_WIDTH + x];
+                ++board[y * BOARD_WIDTH + x];  
     }
-    
+
     int overlapped = 0;
     for (int i = 0; i < BOARD_HEIGHT; ++i)
         for (int j = 0; j < BOARD_WIDTH; ++j)
@@ -76,8 +83,8 @@ int part1(Rect[] rects)
     return overlapped;
 }
 
-// True if not overlapping
-bool AABB(Rect firstRect, Rect secondRect)
+// True if overlapping
+bool overlap(Rect firstRect, Rect secondRect)
 {
     return firstRect.pos.x < (secondRect.pos.x + secondRect.size.x) &&
            firstRect.pos.y < (secondRect.pos.y + secondRect.size.y) &&
@@ -87,7 +94,8 @@ bool AABB(Rect firstRect, Rect secondRect)
 
 int part2(Rect[] rects)
 {
-    int overlapped = 0;
+    // Have an array of rect id, 1 = overlapped, 0 otherwise
+    int[] id = new int[rects.length];
     for (int i = 0; i < rects.length; ++i)
     {
         for (int j = 0; j < rects.length; ++j)
@@ -98,11 +106,19 @@ int part2(Rect[] rects)
             immutable Rect firstRect = rects[i];
             immutable Rect secondRect = rects[j];
             
-            if (AABB(firstRect, secondRect))
+            // Check for any overlapping rect
+            if (overlap(firstRect, secondRect))
             {
-                ++overlapped;
+                id[i] = 1;
+                id[j] = 1;
             }
         }
     }
-    return overlapped;
+
+    for (int i = 0; i < id.length; ++i)
+        if (!id[i])
+            // Because their ID starts from #1
+            return i + 1;
+    // Not found
+    return -1;
 }
